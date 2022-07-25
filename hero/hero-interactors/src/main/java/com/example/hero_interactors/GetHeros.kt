@@ -3,6 +3,7 @@ package com.example.hero_interactors
 import com.example.core.DataState
 import com.example.core.ProgressBarState
 import com.example.core.UIComponent
+import com.example.hero_datasource.cache.HeroCache
 import com.example.hero_domain.Hero
 import com.example.hero_datasource.network.HeroService
 import kotlinx.coroutines.delay
@@ -10,16 +11,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class GetHeros(
-    // TODO(Add caching)
+    private val cache: HeroCache,
     private val service: HeroService,
 ) {
 
     fun execute(): Flow<DataState<List<Hero>>> = flow {
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.Loading))
-
-            // only for testing purposes
-            delay(1000)
 
             val heros: List<Hero> = try { // catch network exceptions
                 service.getHeroStats()
@@ -34,9 +32,13 @@ class GetHeros(
                 listOf()
             }
 
-            // TODO(Add caching)
+            // cache the network data
+            cache.insert(heros)
 
-            emit(DataState.Data(heros))
+            // emit data from cache
+            val cachedHeros = cache.selectAll()
+
+            emit(DataState.Data(cachedHeros))
         }catch (e: Exception){
             e.printStackTrace()
             emit(DataState.Response<List<Hero>>(
