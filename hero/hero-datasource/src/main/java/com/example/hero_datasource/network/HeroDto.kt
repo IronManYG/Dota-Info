@@ -1,10 +1,10 @@
-package com.example.hero_domain.network
+package com.example.hero_datasource.network
 
 import com.example.hero_domain.Hero
 import com.example.hero_domain.getHeroAttackType
 import com.example.hero_domain.getHeroAttrFromAbbreviation
 import com.example.hero_domain.getHeroRole
-import com.example.hero_domain.network.EndPoints.BASE_URL
+import com.example.hero_datasource.network.EndPoints.BASE_URL
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

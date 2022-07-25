@@ -1,6 +1,6 @@
 package com.example.hero_interactors
 
-import com.example.hero_domain.network.HeroService
+import com.example.hero_datasource.network.HeroService
 
 data class HeroInteractors(
     val getHeros: GetHeros,

@@ -1,4 +1,4 @@
-package com.example.hero_domain.network
+package com.example.hero_datasource.network
 
 import com.example.hero_domain.Hero
 import io.ktor.client.*

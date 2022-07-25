@@ -1,4 +1,4 @@
-package com.example.hero_domain.network
+package com.example.hero_datasource.network
 
 object EndPoints {
     const val BASE_URL = "https://api.opendota.com"
