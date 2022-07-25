@@ -1,4 +1,4 @@
-package com.example.hero_datasource
+package com.example.hero_domain
 
 data class Hero(
     val id: Int,

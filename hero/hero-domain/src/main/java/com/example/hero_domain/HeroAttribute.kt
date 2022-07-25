@@ -1,4 +1,4 @@
-package com.example.hero_datasource
+package com.example.hero_domain
 
 sealed class HeroAttribute(
     val uiValue: String,
