@@ -29,6 +29,6 @@ class Logger(
     }
 }
 
-fun printLogD(tag: String, msg: String) {
-    println("$tag: $msg")
+fun printLogD(tag: String, message: String) {
+    println("$tag: $message")
 }
