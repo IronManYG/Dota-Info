@@ -5,6 +5,7 @@ import com.example.core.ProgressBarState
 import com.example.core.UIComponent
 import com.example.hero_domain.Hero
 import com.example.hero_domain.network.HeroService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -16,6 +17,9 @@ class GetHeros(
     fun execute(): Flow<DataState<List<Hero>>> = flow {
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.Loading))
+
+            // only for testing purposes
+            delay(1000)
 
             val heros: List<Hero> = try { // catch network exceptions
                 service.getHeroStats()
