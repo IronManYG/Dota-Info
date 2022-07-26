@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import javax.inject.Named
 
 
 @HiltViewModel
@@ -19,21 +20,20 @@ class HeroListViewModel
 @Inject
 constructor(
     private val getHeros: GetHeros,
-): ViewModel(){
+    @Named("heroListLogger") private val logger: Logger,
+) : ViewModel() {
 
     val state: MutableState<HeroListState> = mutableStateOf(HeroListState())
-
-    private val logger = Logger("HeroListViewModel")
 
     init {
         getHeros()
     }
 
-    private fun getHeros(){
+    private fun getHeros() {
         getHeros.execute().onEach { dataState ->
-            when(dataState){
+            when (dataState) {
                 is DataState.Response -> {
-                    when(dataState.uiComponent){
+                    when (dataState.uiComponent) {
                         is UIComponent.Dialog -> {
                             logger.log((dataState.uiComponent as UIComponent.Dialog).description)
                         }
@@ -43,7 +43,7 @@ constructor(
                     }
                 }
                 is DataState.Data -> {
-                    state.value = state.value.copy(heros = dataState.data?: listOf())
+                    state.value = state.value.copy(heros = dataState.data ?: listOf())
                 }
                 is DataState.Loading -> {
                     state.value = state.value.copy(progressBarState = dataState.progressBarState)
