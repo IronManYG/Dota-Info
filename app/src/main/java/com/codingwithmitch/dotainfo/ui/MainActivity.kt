@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import com.codingwithmitch.dotainfo.ui.navigation.Screen
 import com.codingwithmitch.dotainfo.ui.theme.DotaInfoTheme
-import com.example.ui_herodetail.HeroDetail
+import com.example.ui_herodetail.ui.HeroDetail
 import com.example.ui_herolist.ui.HeroList
 import com.example.ui_herolist.ui.HeroListViewModel
 import dagger.hilt.android.AndroidEntryPoint
