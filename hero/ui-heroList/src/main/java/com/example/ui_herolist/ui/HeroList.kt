@@ -1,4 +1,4 @@
-package com.example.ui_herolist
+package com.example.ui_herolist.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,29 +11,31 @@ import androidx.compose.ui.Modifier
 import coil.ImageLoader
 import com.example.core.ProgressBarState
 import com.example.ui_herolist.components.HeroListItem
-import com.example.ui_herolist.ui.HeroListState
 
 @Composable
 fun HeroList(
     state: HeroListState,
     imageLoader: ImageLoader,
-){
+    navigateToDetailScreen: (Int) -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize()
-    ){
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-        ){
-            items(state.heros){ hero ->
+        ) {
+            items(state.heros) { hero ->
                 HeroListItem(
                     hero = hero,
-                    onSelectHero = {},
+                    onSelectHero = { heroId ->
+                        navigateToDetailScreen(heroId)
+                    },
                     imageLoader = imageLoader,
                 )
             }
         }
-        if(state.progressBarState is ProgressBarState.Loading){
+        if (state.progressBarState is ProgressBarState.Loading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
