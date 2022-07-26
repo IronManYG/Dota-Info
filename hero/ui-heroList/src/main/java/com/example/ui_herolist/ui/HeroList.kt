@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import coil.ImageLoader
 import com.example.core.ProgressBarState
 import com.example.ui_herolist.components.HeroListItem
+import com.example.ui_herolist.ui.HeroListState
 
 @Composable
 fun HeroList(
