@@ -1,6 +1,6 @@
 package com.codingwithmitch.dotainfo.di
 
-import com.example.core.Logger
+import com.example.core.util.Logger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

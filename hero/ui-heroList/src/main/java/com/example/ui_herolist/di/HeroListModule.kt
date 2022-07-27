@@ -1,6 +1,6 @@
 package com.example.ui_herolist.di
 
-import com.example.core.Logger
+import com.example.core.util.Logger
 import com.example.hero_interactors.GetHeros
 import com.example.hero_interactors.HeroInteractors
 import dagger.Module
