@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.domain.DataState
 import com.example.core.domain.UIComponent
 import com.example.core.util.Logger
+import com.example.hero_domain.HeroAttribute
 import com.example.hero_domain.HeroFilter
 import com.example.hero_interactors.FilterHeros
 import com.example.hero_interactors.GetHeros
@@ -45,10 +46,18 @@ constructor(
             is HeroListEvents.UpdateHeroName -> {
                 updateHeroName(event.heroName)
             }
+            is HeroListEvents.UpdateAttributeFilter -> {
+                updateAttributeFilter(event.attribute)
+            }
             is HeroListEvents.UpdateFilterDialogState -> {
                 state.value = state.value.copy(filterDialogState = event.uiComponentState)
             }
         }
+    }
+
+    private fun updateAttributeFilter(attribute: HeroAttribute) {
+        state.value = state.value.copy(primaryAttrFilter = attribute)
+        filterHeros()
     }
 
     private fun updateHeroName(heroName: String) {

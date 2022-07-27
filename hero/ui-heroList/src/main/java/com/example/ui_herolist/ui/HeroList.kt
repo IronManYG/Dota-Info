@@ -26,11 +26,11 @@ fun HeroList(
     events: (HeroListEvents) -> Unit,
     imageLoader: ImageLoader,
     navigateToDetailScreen: (Int) -> Unit,
-){
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-    ){
+    ) {
         Column {
             HeroListToolbar(
                 heroName = state.heroName,
@@ -47,8 +47,8 @@ fun HeroList(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-            ){
-                items(state.filteredHeros){ hero ->
+            ) {
+                items(state.filteredHeros) { hero ->
                     HeroListItem(
                         hero = hero,
                         onSelectHero = { heroId ->
@@ -59,18 +59,22 @@ fun HeroList(
                 }
             }
         }
-        if(state.filterDialogState is UIComponentState.Show){
+        if (state.filterDialogState is UIComponentState.Show) {
             HeroListFilter(
                 heroFilter = state.heroFilter,
                 onUpdateHeroFilter = { heroFilter ->
                     events(HeroListEvents.UpdateHeroFilter(heroFilter))
+                },
+                attributeFilter = state.primaryAttrFilter,
+                onUpdateAttributeFilter = { attribute ->
+                    events(HeroListEvents.UpdateAttributeFilter(attribute))
                 },
                 onCloseDialog = {
                     events(HeroListEvents.UpdateFilterDialogState(UIComponentState.Hide))
                 }
             )
         }
-        if(state.progressBarState is ProgressBarState.Loading){
+        if (state.progressBarState is ProgressBarState.Loading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
