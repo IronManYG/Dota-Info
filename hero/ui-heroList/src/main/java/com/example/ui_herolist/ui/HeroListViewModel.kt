@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.domain.DataState
 import com.example.core.domain.UIComponent
 import com.example.core.util.Logger
-import com.example.hero_domain.Hero
+import com.example.hero_interactors.FilterHeros
 import com.example.hero_interactors.GetHeros
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -20,8 +20,9 @@ class HeroListViewModel
 @Inject
 constructor(
     private val getHeros: GetHeros,
+    private val filterHeros: FilterHeros,
     private val logger: Logger,
-): ViewModel(){
+) : ViewModel() {
 
     val state: MutableState<HeroListState> = mutableStateOf(HeroListState())
 
@@ -29,8 +30,8 @@ constructor(
         onTriggerEvent(HeroListEvents.GetHeros)
     }
 
-    fun onTriggerEvent(event: HeroListEvents){
-        when(event){
+    fun onTriggerEvent(event: HeroListEvents) {
+        when (event) {
             is HeroListEvents.GetHeros -> {
                 getHeros()
             }
@@ -47,18 +48,21 @@ constructor(
         state.value = state.value.copy(heroName = heroName)
     }
 
-    private fun filterHeros(){
-        val filteredList: MutableList<Hero> = state.value.heros.filter {
-            it.localizedName.lowercase().contains(state.value.heroName.lowercase())
-        }.toMutableList()
+    private fun filterHeros() {
+        val filteredList = filterHeros.execute(
+            current = state.value.heros,
+            heroName = state.value.heroName,
+            heroFilter = state.value.heroFilter,
+            attributeFilter = state.value.primaryAttrFilter,
+        )
         state.value = state.value.copy(filteredHeros = filteredList)
     }
 
-    private fun getHeros(){
+    private fun getHeros() {
         getHeros.execute().onEach { dataState ->
-            when(dataState){
+            when (dataState) {
                 is DataState.Response -> {
-                    when(dataState.uiComponent){
+                    when (dataState.uiComponent) {
                         is UIComponent.Dialog -> {
                             logger.log((dataState.uiComponent as UIComponent.Dialog).description)
                         }
@@ -68,7 +72,7 @@ constructor(
                     }
                 }
                 is DataState.Data -> {
-                    state.value = state.value.copy(heros = dataState.data?: listOf())
+                    state.value = state.value.copy(heros = dataState.data ?: listOf())
                     filterHeros()
                 }
                 is DataState.Loading -> {
