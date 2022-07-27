@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.DataState
 import com.example.core.Logger
 import com.example.core.UIComponent
+import com.example.hero_domain.Hero
 import com.example.hero_interactors.GetHeros
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -20,8 +21,8 @@ class HeroListViewModel
 @Inject
 constructor(
     private val getHeros: GetHeros,
-    @Named("heroListLogger") private val logger: Logger,
-) : ViewModel() {
+    private val logger: Logger,
+): ViewModel(){
 
     val state: MutableState<HeroListState> = mutableStateOf(HeroListState())
 
@@ -34,14 +35,31 @@ constructor(
             is HeroListEvents.GetHeros -> {
                 getHeros()
             }
+            is HeroListEvents.FilterHeros -> {
+                filterHeros()
+            }
+            is HeroListEvents.UpdateHeroName -> {
+                updateHeroName(event.heroName)
+            }
         }
     }
 
-    private fun getHeros() {
+    private fun updateHeroName(heroName: String) {
+        state.value = state.value.copy(heroName = heroName)
+    }
+
+    private fun filterHeros(){
+        val filteredList: MutableList<Hero> = state.value.heros.filter {
+            it.localizedName.lowercase().contains(state.value.heroName.lowercase())
+        }.toMutableList()
+        state.value = state.value.copy(filteredHeros = filteredList)
+    }
+
+    private fun getHeros(){
         getHeros.execute().onEach { dataState ->
-            when (dataState) {
+            when(dataState){
                 is DataState.Response -> {
-                    when (dataState.uiComponent) {
+                    when(dataState.uiComponent){
                         is UIComponent.Dialog -> {
                             logger.log((dataState.uiComponent as UIComponent.Dialog).description)
                         }
@@ -51,7 +69,8 @@ constructor(
                     }
                 }
                 is DataState.Data -> {
-                    state.value = state.value.copy(heros = dataState.data ?: listOf())
+                    state.value = state.value.copy(heros = dataState.data?: listOf())
+                    filterHeros()
                 }
                 is DataState.Loading -> {
                     state.value = state.value.copy(progressBarState = dataState.progressBarState)
