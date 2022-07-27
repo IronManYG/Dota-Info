@@ -13,6 +13,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import coil.ImageLoader
 import com.example.core.domain.ProgressBarState
+import com.example.core.domain.UIComponentState
 import com.example.ui_herolist.components.HeroListFilter
 import com.example.ui_herolist.components.HeroListItem
 import com.example.ui_herolist.components.HeroListToolbar
@@ -25,11 +26,11 @@ fun HeroList(
     events: (HeroListEvents) -> Unit,
     imageLoader: ImageLoader,
     navigateToDetailScreen: (Int) -> Unit,
-) {
+){
     Box(
         modifier = Modifier
             .fillMaxSize()
-    ) {
+    ){
         Column {
             HeroListToolbar(
                 heroName = state.heroName,
@@ -40,14 +41,14 @@ fun HeroList(
                     events(HeroListEvents.FilterHeros)
                 },
                 onShowFilterDialog = {
-
+                    events(HeroListEvents.UpdateFilterDialogState(UIComponentState.Show))
                 }
             )
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-            ) {
-                items(state.filteredHeros) { hero ->
+            ){
+                items(state.filteredHeros){ hero ->
                     HeroListItem(
                         hero = hero,
                         onSelectHero = { heroId ->
@@ -58,18 +59,22 @@ fun HeroList(
                 }
             }
         }
-        HeroListFilter(
-            heroFilter = state.heroFilter,
-            onUpdateHeroFilter = { heroFilter ->
-                events(HeroListEvents.UpdateHeroFilter(heroFilter))
-            },
-        ) {
-
+        if(state.filterDialogState is UIComponentState.Show){
+            HeroListFilter(
+                heroFilter = state.heroFilter,
+                onUpdateHeroFilter = { heroFilter ->
+                    events(HeroListEvents.UpdateHeroFilter(heroFilter))
+                },
+                onCloseDialog = {
+                    events(HeroListEvents.UpdateFilterDialogState(UIComponentState.Hide))
+                }
+            )
         }
-        if (state.progressBarState is ProgressBarState.Loading) {
+        if(state.progressBarState is ProgressBarState.Loading){
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
         }
     }
 }
+
