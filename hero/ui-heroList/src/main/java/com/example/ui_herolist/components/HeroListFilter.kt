@@ -22,6 +22,7 @@ import com.example.hero_domain.HeroFilter
 import com.example.ui_herolist.ui.test.TAG_HERO_FILTER_DIALOG
 import com.example.ui_herolist.ui.test.TAG_HERO_FILTER_DIALOG_DONE
 import com.example.ui_herolist.ui.test.TAG_HERO_FILTER_HERO_CHECKBOX
+import com.example.ui_herolist.ui.test.TAG_HERO_FILTER_PROWINS_CHECKBOX
 
 @ExperimentalAnimationApi
 @Composable
@@ -29,11 +30,12 @@ fun HeroListFilter(
     heroFilter: HeroFilter,
     onUpdateHeroFilter: (HeroFilter) -> Unit,
     onCloseDialog: () -> Unit,
-) {
+){
     AlertDialog(
         modifier = Modifier
             .padding(16.dp)
-            .testTag(TAG_HERO_FILTER_DIALOG),
+            .testTag(TAG_HERO_FILTER_DIALOG)
+        ,
         onDismissRequest = {
             onCloseDialog()
         },
@@ -45,11 +47,11 @@ fun HeroListFilter(
         },
         text = {
             LazyColumn {
-                item {
+                item{
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                    ) {
+                    ){
 
                         // Spacer isn't working for some reason so use Row to create space
                         EmptyRow()
@@ -60,7 +62,7 @@ fun HeroListFilter(
                                 onUpdateHeroFilter(HeroFilter.Hero())
                             },
                             isEnabled = heroFilter is HeroFilter.Hero,
-                            order = if (heroFilter is HeroFilter.Hero) heroFilter.order else null,
+                            order = if(heroFilter is HeroFilter.Hero) heroFilter.order else null,
                             orderDesc = {
                                 onUpdateHeroFilter(
                                     HeroFilter.Hero(
@@ -76,6 +78,31 @@ fun HeroListFilter(
                                 )
                             }
                         )
+
+                        // Pro Win Rate Filter
+                        ProWinsFilterSelector(
+                            filterOnProWins = {
+                                onUpdateHeroFilter(
+                                    HeroFilter.ProWins()
+                                )
+                            },
+                            isEnabled = heroFilter is HeroFilter.ProWins,
+                            order = if(heroFilter is HeroFilter.ProWins) heroFilter.order else null,
+                            orderDesc = {
+                                onUpdateHeroFilter(
+                                    HeroFilter.ProWins(
+                                        order = FilterOrder.Descending
+                                    )
+                                )
+                            },
+                            orderAsc = {
+                                onUpdateHeroFilter(
+                                    HeroFilter.ProWins(
+                                        order = FilterOrder.Ascending
+                                    )
+                                )
+                            },
+                        )
                     }
                 }
             }
@@ -86,18 +113,19 @@ fun HeroListFilter(
                     .padding(8.dp)
                     .fillMaxWidth()
             ) {
-                Row(
-                    // make the icon larger so it's easier to click
+                Row( // make the icon larger so it's easier to click
                     modifier = Modifier
                         .align(Alignment.End)
                         .testTag(TAG_HERO_FILTER_DIALOG_DONE)
                         .clickable {
                             onCloseDialog()
-                        },
-                ) {
+                        }
+                    ,
+                ){
                     Icon(
                         modifier = Modifier
-                            .padding(10.dp),
+                            .padding(10.dp)
+                        ,
                         imageVector = Icons.Default.Check,
                         contentDescription = "Done",
                         tint = Color(0xFF009a34)
@@ -124,11 +152,11 @@ fun HeroFilterSelector(
     order: FilterOrder? = null,
     orderDesc: () -> Unit,
     orderAsc: () -> Unit,
-) {
+){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-    ) {
+    ){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,12 +169,14 @@ fun HeroFilterSelector(
                     onClick = {
                         filterOnHero()
                     },
-                ),
-        ) {
+                )
+            ,
+        ){
             Checkbox(
                 modifier = Modifier
                     .padding(end = 8.dp)
-                    .align(Alignment.CenterVertically),
+                    .align(Alignment.CenterVertically)
+                ,
                 checked = isEnabled,
                 onCheckedChange = {
                     filterOnHero()
@@ -162,6 +192,74 @@ fun HeroFilterSelector(
         OrderSelector(
             descString = "z -> a",
             ascString = "a -> z",
+            isEnabled = isEnabled,
+            isDescSelected = isEnabled && order is FilterOrder.Descending,
+            isAscSelected = isEnabled && order is FilterOrder.Ascending,
+            onUpdateHeroFilterDesc = {
+                orderDesc()
+            },
+            onUpdateHeroFilterAsc = {
+                orderAsc()
+            },
+        )
+    }
+}
+
+/**
+ * @param filterOnProWins: Set the HeroFilter to 'ProWins'
+ * @param isEnabled: Is the ProWins filter the selected 'HeroFilter'
+ * @param order: Ascending or Descending?
+ * @param orderDesc: Set the order to descending.
+ * @param orderAsc: Set the order to ascending.
+ */
+@ExperimentalAnimationApi
+@Composable
+fun ProWinsFilterSelector(
+    filterOnProWins: () -> Unit,
+    isEnabled: Boolean,
+    order: FilterOrder? = null,
+    orderDesc: () -> Unit,
+    orderAsc: () -> Unit,
+){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        Row(
+            modifier = Modifier
+                .padding(bottom = 12.dp)
+                .fillMaxWidth()
+                .testTag(TAG_HERO_FILTER_PROWINS_CHECKBOX)
+                .clickable(
+                    interactionSource = MutableInteractionSource(),
+                    indication = null, // disable the highlight
+                    enabled = true,
+                    onClick = {
+                        filterOnProWins()
+                    },
+                )
+            ,
+        ){
+            Checkbox(
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .align(Alignment.CenterVertically)
+                ,
+                checked = isEnabled,
+                onCheckedChange = {
+                    filterOnProWins()
+                },
+                colors = CheckboxDefaults.colors(MaterialTheme.colors.primary)
+            )
+            Text(
+                text = HeroFilter.ProWins().uiValue,
+                style = MaterialTheme.typography.h3,
+            )
+        }
+
+        OrderSelector(
+            descString = "100% - 0%",
+            ascString = "0% - 100%",
             isEnabled = isEnabled,
             isDescSelected = isEnabled && order is FilterOrder.Descending,
             isAscSelected = isEnabled && order is FilterOrder.Ascending,
