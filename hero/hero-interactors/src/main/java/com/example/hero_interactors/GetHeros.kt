@@ -39,8 +39,6 @@ class GetHeros(
             val cachedHeros = cache.selectAll()
 
             emit(DataState.Data(cachedHeros))
-
-            throw Exception("Something went wrong")
         }catch (e: Exception){
             e.printStackTrace()
             emit(
