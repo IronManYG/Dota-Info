@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.DataState
+import com.example.core.domain.Queue
 import com.example.core.domain.UIComponent
 import com.example.core.util.Logger
 import com.example.hero_domain.HeroAttribute
@@ -24,7 +25,7 @@ constructor(
     private val getHeros: GetHeros,
     private val filterHeros: FilterHeros,
     private val logger: Logger,
-) : ViewModel() {
+): ViewModel(){
 
     val state: MutableState<HeroListState> = mutableStateOf(HeroListState())
 
@@ -32,8 +33,8 @@ constructor(
         onTriggerEvent(HeroListEvents.GetHeros)
     }
 
-    fun onTriggerEvent(event: HeroListEvents) {
-        when (event) {
+    fun onTriggerEvent(event: HeroListEvents){
+        when(event){
             is HeroListEvents.GetHeros -> {
                 getHeros()
             }
@@ -64,12 +65,12 @@ constructor(
         state.value = state.value.copy(heroName = heroName)
     }
 
-    private fun updateHeroFilter(heroFilter: HeroFilter) {
+    private fun updateHeroFilter(heroFilter: HeroFilter){
         state.value = state.value.copy(heroFilter = heroFilter)
         filterHeros()
     }
 
-    private fun filterHeros() {
+    private fun filterHeros(){
         val filteredList = filterHeros.execute(
             current = state.value.heros,
             heroName = state.value.heroName,
@@ -79,21 +80,19 @@ constructor(
         state.value = state.value.copy(filteredHeros = filteredList)
     }
 
-    private fun getHeros() {
+    private fun getHeros(){
         getHeros.execute().onEach { dataState ->
-            when (dataState) {
+            when(dataState){
                 is DataState.Response -> {
-                    when (dataState.uiComponent) {
-                        is UIComponent.Dialog -> {
-                            logger.log((dataState.uiComponent as UIComponent.Dialog).description)
-                        }
-                        is UIComponent.None -> {
-                            logger.log((dataState.uiComponent as UIComponent.None).message)
-                        }
+                    if(dataState.uiComponent is UIComponent.None){
+                        logger.log("getHeros: ${(dataState.uiComponent as UIComponent.None).message}")
+                    }
+                    else{
+                        appendToMessageQueue(dataState.uiComponent)
                     }
                 }
                 is DataState.Data -> {
-                    state.value = state.value.copy(heros = dataState.data ?: listOf())
+                    state.value = state.value.copy(heros = dataState.data?: listOf())
                     filterHeros()
                 }
                 is DataState.Loading -> {
@@ -101,5 +100,12 @@ constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun appendToMessageQueue(uiComponent: UIComponent){
+        val queue = state.value.errorQueue
+        queue.add(uiComponent)
+        state.value = state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
+        state.value = state.value.copy(errorQueue = queue)
     }
 }
